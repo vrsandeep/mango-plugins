@@ -1,0 +1,8 @@
+{
+	"id": "Wordpress",
+	"title": "Wordpress",
+	"author": "Robzimpulse - kugelfang.killaruna@gmail.com",
+	"version": "v1.0",
+	"placeholder": "Place complete manga URL from sites like ToonClash, which run on Wordpress",
+	"wait_seconds": 5
+}

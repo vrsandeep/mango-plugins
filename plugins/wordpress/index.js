@@ -21,7 +21,17 @@ function listChapters(url) {
         var chapterTitleNode = mango.css(element, '[href]')[0]
         var chapterTitle = mango.text(chapterTitleNode).trim().split(" ").slice(0, 2).join(" ") 
         var id = mango.attribute(chapterTitleNode, 'href')
-        chapters.push({ id: toHex(id), title: chapterTitle })
+        var chapterNumber = chapterTitle.split(" ")[1]
+        var dateNode = mango.css(element, '.chapter-release-date')
+
+        console.log(dateNode)
+        console.log("!!")
+        var date = mango.text(dateNode[0]).trim()
+        if (!date) {
+            dateNode = mango.css(element, '.chapter-release-date a')
+            date = mango.attribute(dateNode[0], 'title')
+        }
+        chapters.push({ id: toHex(id), title: chapterTitle, "#": chapterNumber, "Date": date })
     })
 
     return JSON.stringify({ chapters: chapters, title: title })
@@ -73,7 +83,7 @@ function nextPage() {
 // convert url to hex string 
 function toHex(s) {
     // utf8 to latin1
-    var s = unescape(encodeURIComponent(s))
+    var s = decodeURIComponent(encodeURIComponent(s))
     var h = ''
     for (var i = 0; i < s.length; i++) {
         h += s.charCodeAt(i).toString(16)
