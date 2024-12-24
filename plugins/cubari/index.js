@@ -11,11 +11,11 @@ function listChapters(query) {
 		manga.raise("Invalid Cubari URL.");
 	}
 	
-	if (cubariURLMatch[1] != "gist" && cubariURLMatch[1] != "imgur") {
-		manga.raise("Invalid Cubari URL.");
-	}
+	// if (cubariURLMatch[1] != "gist" && cubariURLMatch[1] != "imgur") {
+	// 	manga.raise("Invalid Cubari URL.");
+	// }
 	
-	var cubariType = cubariURLMatch[1]; // "imgur" or "gist"
+	var cubariType = cubariURLMatch[1]; // "imgur" or "gist" or "mangasee"
 	var mangaSlug = cubariURLMatch[2];
 	var mangaURL = API_URL + cubariType + "/series/" + mangaSlug + "/";
 
@@ -49,6 +49,7 @@ function listChapters(query) {
 		var slimObj = {};
 		slimObj["id"] = chapterID;
 		slimObj["title"] = chapterTitle;
+		slimObj["volume"] = chapter["volume"];
 
 		chapters.push(slimObj);
 	});
@@ -60,7 +61,7 @@ function listChapters(query) {
 }
 
 function selectChapter(id) {
-	var mangaIDMatch = /(gist|imgur)_{3}(.+?)_{3}(.+)$/.exec(id);
+	var mangaIDMatch = /(\w+)_{3}(.+?)_{3}(.+)$/.exec(id);
 	var cubariType = mangaIDMatch[1];
 	var mangaSlug = mangaIDMatch[2].replace(/\_/, "-"); // Convert '_' back to '-'
 	var chapterNum = mangaIDMatch[3].replace(/\_/, "."); // Convert '_' back to '.'
@@ -69,7 +70,7 @@ function selectChapter(id) {
 
 	var proxySlug = mangaSlug;
 
-	if (cubariType == "gist") {
+	if (cubariType != "imgur") {
 		var mangaURL = API_URL + cubariType + "/series/" + mangaSlug + "/";
 		var mangaJSONString = mango.get(mangaURL).body;
 	
@@ -96,7 +97,11 @@ function selectChapter(id) {
 		proxySlug = mangaURLMatch[1];
 	}
 
-	chapterURL = API_URL + "imgur/chapter/" + proxySlug + "/";
+	if (cubariType == "gist") {
+		cubariType = "imgur";
+	}
+
+	chapterURL = API_URL + cubariType + "/chapter/" + proxySlug + "/";
 	
 	var proxyJSONString = mango.get(chapterURL).body;
 
@@ -109,7 +114,14 @@ function selectChapter(id) {
 	imgURLs = [];
 	var chapterIndexAsArray = Object.keys(proxyJSON);
 	chapterIndexAsArray.forEach(function(index) {
-		imgURLs.push(proxyJSON[index]["src"]);
+		if (typeof proxyJSON[index] == "string") {
+			imgURLs.push(proxyJSON[index]);
+		} else if (proxyJSON[index] instanceof Object) {
+			imgURLs.push(proxyJSON[index]["src"]);
+		} else {
+			console.log(proxyJSON);
+			mango.raise("Failed to get image URLs.");
+		}
 	});
 
 	currentPage = 0;
@@ -127,7 +139,7 @@ function nextPage() {
 	}
 	
 	var url = imgURLs[currentPage]
-	var filename = pad(currentPage, digits) + '.' + /\.(\w+)(\?.*)?$/.exec(url)[0];
+	var filename = pad(currentPage, digits)+ '.' + extension(url);
 
 	currentPage += 1;
 	return JSON.stringify({
@@ -141,4 +153,12 @@ function pad(n, width, z) {
 	z = z || '0';
 	n = n + '';
 	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function extension(url) {
+	var extensionMatch = /\.(\w+)(\?.*)?$/.exec(url);
+	if (!extensionMatch) {
+		return "png";
+	}
+	return extensionMatch[0];
 }
