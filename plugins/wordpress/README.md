@@ -1,6 +1,6 @@
 # Mangatx Plugin
 
-This is the Mango plugin for [MangaTX](https://mangatx.com/) and other wordpress-based manga hosting (ex: [MangaClash](https://mangaclash.com/)]). 
+This is the Mango plugin for [Toon Clash](https://toonclash.com/) and other wordpress-based manga hostings sites (ex: [MangaClash](https://mangaclash.com/)). 
 
 Note that
 

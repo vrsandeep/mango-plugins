@@ -4,7 +4,7 @@ var imgURLs;
 
 const BASE_URL = "https://www.webtoons.com";
 const MOBILE_URL = "https://m.webtoons.com";
-const SEARCH_URL = "https://ac.webtoons.com/ac?q=en%5E";
+const SEARCH_URL = "https://www.webtoons.com/en/search/immediate?keyword=";
 const SEARCH_PARAMS = "&q_enc=UTF-8&st=1&r_format=json&r_enc=UTF-8";
 
 const LIST_ENDPOINT = "/episodeList?titleNo=";
@@ -19,26 +19,16 @@ function listChapters(query) {
 		mango.raise("An error occured while searching.");
 	}
 
-	if (search["items"].length == 0) mango.raise("Could not find a webtoon with that title.");
-
-	var mangaID;
-	var mangaTitle;
-	for (var i = 0; i < search["items"][0].length; i++) {
-		var item = search["items"][0][i];
-		
-		// Get first webtoon, ignore authors
-		if (item[1][0] == "TITLE") {
-			mangaID = item[3][0];
-			mangaTitle = item[0][0];
-			break;
-		}
-	}
+	if (search["total"] == 0) mango.raise("Could not find a webtoon with that title.");
+	var searchedItems = search["result"]["searchedList"];
+	var mangaID = searchedItems[0]["titleNo"];
+	var mangaTitle = searchedItems[0]["title"];
 
 	if (!mangaID) mango.raise("Could not find a webtoon with that title.");
 
 	try {
 		var resp = mango.get(BASE_URL + LIST_ENDPOINT + mangaID);
-		var urlLocation = resp.headers.Location;
+		var urlLocation = resp.headers["location"];
 	} catch (error) {
 		mango.raise("Could not get webtoon page.");
 	}
@@ -110,7 +100,7 @@ function selectChapter(id) {
 
 	try {
 		var resp = mango.get(BASE_URL + LIST_ENDPOINT + mangaID);
-		var urlLocation = resp.headers.Location;
+		var urlLocation = resp.headers["location"];
 	} catch (error) {
 		mango.raise("Could not get webtoon chapter list.");
 	}
