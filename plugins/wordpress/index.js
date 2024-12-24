@@ -24,8 +24,6 @@ function listChapters(url) {
         var chapterNumber = chapterTitle.split(" ")[1]
         var dateNode = mango.css(element, '.chapter-release-date')
 
-        console.log(dateNode)
-        console.log("!!")
         var date = mango.text(dateNode[0]).trim()
         if (!date) {
             dateNode = mango.css(element, '.chapter-release-date a')
