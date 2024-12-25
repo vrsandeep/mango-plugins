@@ -62,6 +62,14 @@ function parseTime(time) {
     return year + "-" + months.indexOf(month) + "-" + day;
 }
 
+
+function newChapters(mangaId, after) {
+    var chapters = listChapters(mangaId);
+    return JSON.stringify(chapters.filter(function (c) {
+        return c.published_at > after;
+    }));
+}
+
 function selectChapter(id) {
     var mangaId = id.split("/")[0].toString();
     const manga = getManga(mangaId);
