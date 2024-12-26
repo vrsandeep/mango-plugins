@@ -70,7 +70,7 @@ function listChapters(id) {
 }
 
 function newChapters(mangaId, after) {
-    var chapters = listChapters(mangaId);
+    var chapters = JSON.parse(listChapters(mangaId));
     return JSON.stringify(chapters.filter(function (c) {
         return c.published_at > after;
     }));

@@ -1,8 +1,9 @@
 {
 	"id": "Webtoons",
 	"title": "Webtoons",
-	"author": "TheBritishAccent - thebritaccent@gmail.com",
-	"version": "v1.0",
+	"author": "Sandeep Rao",
+	"version": "v2.0",
 	"placeholder": "Search Webtoons",
-	"wait_seconds": 1
+	"wait_seconds": 5,
+	"api_version": 2
 }
