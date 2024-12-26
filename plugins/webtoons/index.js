@@ -142,16 +142,13 @@ function selectChapter(id) {
 
 	while (true) {
 		resp = mango.get(viewerURL);
-		if (resp.status_code !== 200) {
-			console.log(resp.status_code);
-			if (resp.status_code === 301) {
-				viewerURL = BASE_URL + resp.headers["location"];
-				console.log("Redirecting to: " + viewerURL);
-			} else {
-				mango.raise("Failed to get webtoon chapter viewer.");
-			}
-		} else {
+		if (resp.status_code === 301) {
+			viewerURL = BASE_URL + resp.headers["location"];
+			console.log("Fetching from redirected url: " + viewerURL);
+		} else if (resp.status_code == 200) {
 			break;
+		} else {
+			mango.raise("Failed to get webtoon chapter viewer.");
 		}
 	}
 	var html = resp.body;
