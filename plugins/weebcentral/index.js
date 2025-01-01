@@ -43,17 +43,22 @@ function listChapters(id) {
     var seriesSlug = idsSplit.pop();
     var idWithoutSeriesName = idsSplit.pop();
     res = mango.get(SERIES_URL + idWithoutSeriesName + "/full-chapter-list");
+    if (res.status_code !== 200) {
+        mango.raise('Failed to get full chapter list. Status ' + res.status_code);
+    }
 
     const manga = mango.css(res.body, "a");
     return JSON.stringify(manga.map(function (m) {
         var chapter_link  = mango.attribute(m, "href");
         if (!chapter_link.includes(MAIN_URL)) {
+            // Reached the end of the chapter list and the final link is #top
             return;
         }
+
         var chapter_title = mango.text(mango.css(mango.css(m, "span")[2], "span")[0]);
         var published_at_node = mango.attribute(m, "x-data");
         var published_at = published_at_node.split("'")[1];
-        var chapter_num = /Chapter (\d+)/.exec(chapter_title)[1];
+        var chapter_num = /.+ (\d+)/.exec(chapter_title)[1];
 
         const obj = {
             id: id + "/" + chapter_title + "/" + Date.parse(published_at) + "/" + chapter_link.split("/").pop(),
@@ -86,11 +91,9 @@ function selectChapter(id) {
 
     // get chapter number
     const chapter_title = idSplit[2];
-    const chapter_num = /Chapter (\d+)/.exec(chapter_title)[1];
+    const chapter_num = /.+ (\d+)/.exec(chapter_title)[1];
 
     const published_at = idSplit[3];
-
-
     // get images
     var chapterId = idSplit.pop();
     var res = mango.get(CHAPTERS_URL + chapterId + "/images?is_prev=False&reading_style=long_strip");
