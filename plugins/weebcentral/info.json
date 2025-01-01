@@ -4,6 +4,6 @@
 	"author": "Sandeep Rao",
 	"version": "v2.0",
 	"placeholder": "Search for manga from https://weebcentral.com/",
-	"wait_seconds": 5,
+	"wait_seconds": 1,
 	"api_version": 2
 }
