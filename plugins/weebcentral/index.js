@@ -47,26 +47,29 @@ function listChapters(id) {
         mango.raise('Failed to get full chapter list. Status ' + res.status_code);
     }
 
-    const manga = mango.css(res.body, "a");
-    return JSON.stringify(manga.map(function (m) {
+    const manga = mango.css(res.body, "div");
+    return JSON.stringify(manga.map(function (manga_div) {
+        var published_at_node = mango.attribute(manga_div, "x-data");
+        var published_at = Date.parse(published_at_node.split("'")[1]);
+
+        var m = mango.css(manga_div, "a")[0];
         var chapter_link  = mango.attribute(m, "href");
+
         if (!chapter_link.includes(MAIN_URL)) {
             // Reached the end of the chapter list and the final link is #top
             return;
         }
-
         var chapter_title = mango.text(mango.css(mango.css(m, "span")[2], "span")[0]);
-        var published_at_node = mango.attribute(m, "x-data");
-        var published_at = published_at_node.split("'")[1];
         var chapter_num = /.+ (\d+)/.exec(chapter_title)[1];
 
         const obj = {
-            id: id + "/" + chapter_title + "/" + Date.parse(published_at) + "/" + chapter_link.split("/").pop(),
+            id: id + "/" + chapter_title + "/" + published_at + "/" + chapter_link.split("/").pop(),
             title: chapter_title,
             manga_title: mangaTitle,
             pages: 0,
             chapter: chapter_num,
-            published_at: Date.parse(published_at)
+            published_at: published_at
+
         };
         return obj;
     }).filter(function (f) {
